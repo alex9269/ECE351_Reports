@@ -1,0 +1,124 @@
+%----------------------------------------------------------------
+% Alex Morrison
+% ECE351-51
+% Lab 1
+% 9/9/19
+%----------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{Introduction to Jupyter Notebook}								
+% Title
+\author{ Alex Morrison}						
+% Author
+\date{September 9, 2019}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large ECE 351-51}\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large  Lab 1}\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Alex Morrison  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+ 
+In this lab we were taught the basics of using Python, including how to set up and call matrices using arrays, how to create basic plots, and how to work with complex numbers. The goal was to become familiar with the coding environment that Jupyter Notebook (or Spyder) present.
+
+\section{The Jupyter Notebook Environment}
+
+Jupyter Notebook is a fairly straightforward coding environment that runs its code cell by cell. It reads line by line, meaning we don't have to place semicolons after each statement. This does mean we need to be careful with spacing, because it reads spaces such as tabs as a specific part of formatting functions. There are also different types of cells, called active and markdown cells. Active cells compile and run code, while markdown cells are used for writing text. The markdown cells do use some html coding functions, so knowledge of that is useful
+
+\section{Using Python 3.x}
+ \subsection{Variables, Arrays, and Matrices}
+ 
+ In this section, we were taught how to define variables, namely that you don't have to specify a type when defining variables, unlike other programming languages. The major part of this section showed the differences between using lists and arrays. Arrays, which are part of the numpy library, are superior to lists for a few different reasons. The first is that when given a matrix, lists will print the matrix horizontally while arrays print it vertically, which is the way it should be oriented. The second is that arrays can sub-index when attempting to call a specific value within a matrix. A list would instead simply print the whole row of the matrix, while an array will give the specified value. 
+ 
+ \newpage
+ \subsection{Plotting Functions}
+ 
+ This section showed how to use basic plotting functions in Python. Matplotlib is very necessary for running the appropriate functions, so importing it as a shorter name such as 'plt' is helpful. Several subplots can be made within one large plot. In this case, the function 'title' will label the entire plot, while 'ylabel' will label each subplot individually. It is important to specify labels right after each plot is created to ensure the program understands which plot you are labeling. Multiple functions can be plotted within the same subplot, making a legend useful. The colors of these functions can be changed within the 'plot' function. 'Show()' must be used at the end of the plotting specifications in order to view your plots. 
+ 
+ \subsection{Complex Numbers}
+ 
+ In order to work with complex numbers, the numpy library is necessary to have imported. Some important functions are numpy.real(), numpy.imag(), numpy.angle(), and abs(), which will return the real portion, imaginary portion, angle, and magnitude of a complex number, respectively. It's important to note that when working with imaginary numbers, 'nan' can sometimes be returned from having an imaginary number inside of the numpy.sqrt() function. To ensure that this doesn't happen, add '0j' in the square root.
+ 
+\section{Additional Helpful Commands}
+ 
+ Some libraries that are helpful to have imported are numpy, matplotli.pyplot, scipy, scipy.signal, pandas, control and time. Generally these are imported as np, plt, sp, sig, and pd, respectively. Other useful functions that weren't covered earlier are range(), which creates a range of numbers, np.arange(), which creates a numpy array that is a range of numbers with a defined step size. 
+ 
+\section{Questions}
+\subsubsection{For which course are you most excited in your degree? Which course have you enjoyed the most so far?}
+ 
+I think that I'm excited for 350, it seems like a useful and fun class. Beyond that, I'm not sure what I'm looking forward to. I'm still trying to figure out what I like and what I want to specialize in, so in a way everything is exciting because it's all new. The class I've enjoyed the most so far was probably Spanish 306, where I studied Latin American culture and history. It was my third semester in a row with essentially the same group of people studying Spanish, which makes the class dynamic fun, and I love the language anyway, so using it is always a good experience. The teacher was amazing and the content was really interesting to me, especially having grown up in a town with a large Hispanic and migrant population. 
+ 
+ \subsubsection{Feedback on the clarity of the purpose, deliverables, and tasks for this lab.}
+ 
+ What was expected of us for this lab was fairly clear, the only slight confusion I had was simply trying to figure out how to format this report, since it's different than most of the reports we'll do this semester. 
+ 
+ \section{Conclusion}
+ 
+ This lab was a simple way to practice using Jupyter Notebook or Spyder to become familiar with the environment. It also taught many helpful functions that will be needed later on. Knowing basics such as not needing to specify variable types, or that numpy arrays are superior to lists, or even just that Python reads line by line, is invaluable.
+ 
+ GitHub link: https://github.com/alex9269
+
+\end{document}
+
