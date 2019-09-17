@@ -1,0 +1,267 @@
+%----------------------------------------------------------------
+% Alex Morrison
+% ECE351-51
+% Lab 2
+% 9/16/19
+%----------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{hyperref}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{User-Defined Functions}								
+% Title
+\author{ Alex Morrison}						
+% Author
+\date{September 9, 2019}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large ECE 351-51}\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large  Lab 2}\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Alex Morrison  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+
+    
+    
+    
+    
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+ 
+This lab  was designed to teach us how to begin using Python to graph and look at various functions that we have learned about in Signals and Systems. The given function we were told to define in Part 2 could be easily defined using the methods we learned in class, but applying this knowledge to a coding environment is another matter. This lab helped bridge the gap.
+
+\section{Equations}
+
+As step and ramp functions are necessary to define the given graph, it is important to note how these functions are fundamentally defined. A step function is as follows: 
+$$
+    u(t) = 
+    \begin{cases}
+        0 & t < 0 \\
+        1 & t\geq 0
+    \end{cases}
+$$
+Similarly, a ramp function is defined as:
+$$
+    r(t) = 
+    \begin{cases}
+        0 & t < 0 \\
+        t & t\geq 0
+    \end{cases}
+$$
+Finally, we were given the following graph and expected to define it as a function of step and ramp functions.
+\newline
+\includegraphics[width=0.5\textwidth]{Given_func.PNG}
+
+I defined this function as:
+$$my\_func(t) = r(t) + 5u(t-3) - r(t-3) - 2u(t-6) - 2r(t-6)$$
+
+ \section{Methodology}
+ 
+ This lab was split into three parts, each building on the others to reach the final goal of having created a user-defined function in Python that could be shifted and altered in different ways.
+ 
+ \subsection{Part 1}
+ 
+ In this part we were expected to graph the function $f(t)=cos(t)$ using Python. To do so I followed the example code provided in the background section of the lab handout, which left me with the following code:
+ \begin{lstlisting}[language=Python]
+ def func1(t):
+    y = np.zeros((len(t),1))
+      
+    for i in range(len(t)):
+        y[i] = np.cos(t[i])
+    return y
+ \end{lstlisting}
+ 
+ I then graphed this code following the same formatting as the example code and achieved a graph of good quality.
+ 
+ \subsection{Part 2}
+ 
+ The next section required us to define the step and ramp functions in Python and then graph them to ensure that our solution worked. I used simple for loops to define both functions, and ended with the following code:
+ \begin{lstlisting}[language=Python]
+ def step(t):
+    y = np.zeros((len(t),1))
+    
+    for i in range(len(t)):
+        if t[i] < 0:
+            y[i] = 0
+        else:
+            y[i] = 1
+    return y
+\end{lstlisting}
+\newpage
+\begin{lstlisting}[language=Python]
+def ramp(t):
+    y = np.zeros((len(t),1))
+    
+    for i in range(len(t)):
+        if t[i] < 0:
+            y[i] = 0
+        else:
+             y[i] = t[i]
+    return y
+\end{lstlisting}
+
+Once I confirmed that my step and ramp base functions were working, I used them to define the function of the given graph. This code was fairly simple since I was able to incorporate the step and ramp functions I created, making the code appear very similar to the written function:
+\begin{lstlisting}[language=Python]
+def my_func(t):
+    y = np.zeros((len(t),1))
+    
+    y = ramp(t-0)+5*step(t-3)-ramp(t-3)-2*step(t-6)-2*ramp(t-6)
+    
+    return y
+\end{lstlisting}
+
+I then plotted this function to ensure that it matched the original graph.
+ 
+ \subsection{Part 3}
+ 
+ In the final part of the lab, we needed to re-plot our user-defined function with the specified changes. For all of the graphs I created in this lab, I used the same coding structure each time. This structure followed this basic format:
+ \begin{lstlisting}[language=Python]
+myFigSize = (10,8)
+plt.figure(figsize=myFigSize)
+plt.subplot(1,1,1)
+plt.plot(t,y) 
+plt.grid(True)
+plt.ylabel('y')
+plt.xlabel('x')
+plt.title('y(t)=cos(t)')
+plt.show()
+\end{lstlisting}
+
+This particular code is what I used to grah my cosine function from part one. In this code, I begin by defining a figure and its size. I then state how many subplots will be in this figure and which number subplot this particular graph is. Then I use the ever-important plot function, specifying t and y as my variables, and move on to labeling the y and x axes and giving the figure a title. When using multiple sub-plots, my ylabel is the title of each individual graph, making the title the name of the figure as a whole. In this case I don't define my xlabel or use plt.show() until the last subplot.
+
+In this way I plotted every graph for this lab, including those of part three, which required us to make changes to our user-defined function. These changes were to graph our function as a time reversal (with -t), with the shift operations (t-4) and (-t-4), and the time scale operations (t/2) and (2t). Finally, we also had to hand-draw the derivative of our function and graph it using the numpy.diff() operation. 
+
+ 
+ \section{Results}
+ 
+ In part one I defined a cosine function in Spyder and then used my coding example above to plot it, receiving the following graph: 
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Part1_Task2.png}
+    \caption{Part 1 Task 2}
+\end{figure}
+ I ensured that the step size I used when defining t was small enough to have this graph be plotted with a good resolution. 
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Part2_Tasks2-3.png}
+    \caption{Part 2 Tasks 2 \& 3}
+\end{figure}
+ 
+ I then plotted my step, ramp, and user-defined functions, as seen above. All three appeared and worked as expected. Before plotting each of these functions, I called them with y, but didn't have to make more changes than that.
+ 
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Part3_Tasks1-2.png}
+    \caption{Part 3 Tasks 1 \& 2}
+\end{figure}
+
+ Plotting the shifts in part 3 was next, and required more changes to my code to function properly. Calling $my\_func(t)$ as y with each shift was simple enough, but in order to get the graphs to appear properly, I changed the bounds of t before each function was called. Pictured above are graphs for time reversal, (t-4), and (-t-4), respectively. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Part3_Tasks3-5.png}
+    \caption{Part 3 Tasks 2 \& 5}
+    \label{fig:3}
+\end{figure}
+
+The graphs above are for the graph of (t/2), (2t) and the first derivative of the given graph, respectively. These graphs complete the rest of the shifted functions we were asked to graph. As expected, (t/2) causes the function to take twice as long to finish, while (2t) halves the time it takes to reach completion. Finally, the first derivative graph more or less matches what I expected. My own hand-drawn derivative graph is pictured below.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Part3_Task4.jpg}
+    \caption{Part 3 Task 4}
+\end{figure}
+
+ 
+ \section{Error Analysis}
+ 
+ Overall this lab wasn't incredibly difficult. Ensuring I understood and remembered how for loops work was crucial to being able to define my step and ramp functions, which I needed to be able to define the given graph. Figuring out how to get numpy.diff() to work to create the correct derivative graph was difficult, but after collaborating with classmates I came up with the following code:
+ \begin{lstlisting}[language=Python]
+dt = np.diff(t)
+y = np.diff(my_func(t),axis=0)/dt
+\end{lstlisting}
+While it wasn't initially intuitive that I would need to define a dt to be able to get my $dy/dt$, this step does make sense. Setting the axis of the derivative to 0 is another step that ensures that the derivative functions properly, but until looking up how numpy.diff() works and talking with friends, I hadn't realized it was something I would need to do. 
+ 
+ \section{Questions}
+ \subsubsection{Are the plots from Part 3 Tasks 4 and 5 identical? Is it possible for them to match? Explain why or why not.}
+ 
+ No these graphs are not identical. The graph of the derivative that Spyder produced has spikes at t=3 and t=6 that go to infinity and negative infinity (if the step size was small enough to accommodate this), while the graph I drew doesn't have this feature. Fundamentally the graphs are the same, but the computer will never be able to process a step straight up or down, which is why it creates the spikes to infinity, whereas I as a human can see and ignore the step. For this reason the graphs will never match perfectly.
+ 
+ \subsubsection{How does the correlation between the two plots (from Part 3 Tasks 4 and 5) change if you were to change the step size within the time variable in Task 5? Explain why this happens.}
+ 
+ As stated above, the spikes at t=3 and t=6 would go to infinity if the step size were small enough. This is because the function recognizes that there is a step up happening, and the derivative of a step function is a delta function, or a pulse. This is why the derivative graph spikes up or down. As the step size is increased, the computer's derivative looks less and less like my hand-drawn derivative. This is because a larger step size prevents the computer from making accurate calculations. The smaller the step, the more accurate the calculation, which is why the spikes try to go to infinity, causing the graph to look more similar to my own.
+ 
+ \subsubsection{In what way can the expectations and tasks be more clearly explained in this lab?}
+ 
+ I feel like the lab was explained well and had clear expectations. 
+ 
+ \newpage
+ \section{Conclusion}
+ 
+ This lab was simple to do and was a very good intro to using Python. The last lab taught some fundamentals, which was important, but we didn't have to implement them in our own code like in this lab. Doing this forces you to understand what you're doing better so that you can make sure you're completing the lab correctly. This lab pulled off that switch to programming while incorporating basic topics we've covered in class (how to define functions using steps and ramps) very well. 
+ 
+ GitHub link: \url{https://github.com/alex9269}
+ 
+\end{document}
