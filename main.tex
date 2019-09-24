@@ -1,0 +1,237 @@
+%----------------------------------------------------------------
+% Alex Morrison
+% ECE351-51
+% Lab 3
+% 9/23/19
+%----------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{multicol}
+\usepackage{hyperref}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{Discrete Convolution}								
+% Title
+\author{ Alex Morrison}						
+% Author
+\date{September 23, 2019}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large ECE 351-51}\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large  Lab 3}\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Alex Morrison  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+
+    
+    
+    
+    
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+
+This lab continued to have us practice defining functions by having us implement the code we created for step and ramp functions last week. This time, however, we then had to create code that would allow us to convolve our user-defined functions and see how our results matched up with those of the given scipy convolve function.
+
+\section{Equations}
+
+The functions we were given that we needed to define were the following:
+$$f_1(t)= u(t-2) - u(t-9)$$
+$$f_2(t)= e^tu(t)$$
+$$f_3(t)= r(t-2)[u(t-2) - u(t-3)] + r(4-t)[u(t-3) - u(t-4)]$$
+
+ \section{Methodology}
+ 
+ The first step was defining the new functions. The step and ramp functions I defined last week used the following code: 
+ \begin{multicols}{2}
+ \begin{lstlisting}[language=Python]
+ def step(t):
+    y = np.zeros((len(t)))
+    
+    for i in range(len(t)):
+        if t[i] < 0:
+            y[i] = 0
+        else:
+            y[i] = 1
+    return y
+\end{lstlisting}
+\begin{lstlisting}[language=Python]
+def ramp(t):
+    y = np.zeros((len(t)))
+    
+    for i in range(len(t)):
+        if t[i] < 0:
+            y[i] = 0
+        else:
+             y[i] = t[i]
+    return y
+\end{lstlisting}
+\end{multicols}
+
+I then used these to define the given functions as follows:
+\begin{lstlisting}[language=Python]
+def func_1(t):
+    y = np.zeros((len(t),1))
+    y = step(t-2)-step(t-9)
+    return y
+
+def func_2(t):
+    y = np.zeros((len(t),1))
+    y = np.exp(-t)
+    return y
+
+def func_3(t):
+    y = np.zeros((len(t),1))
+    y = (ramp(t-2)*(step(t-2)-step(t-3)))
+    +(ramp(4-t)*(step(t-3)-step(t-4)))
+    return y
+\end{lstlisting}
+I then plotted these to ensure that my code worked properly. Upon seeing that the functions were graphed correctly, I began working on defining convolution. My immediate thoughts went to the mathematical definition of convolution, namely the following equation: $\int_{0}^{t} h(\tau)f(t-\tau)\,d\tau$. Thus, I began attempting to figure out how to use some integral function to accomplish this, before realizing that I needed to be even more simplistic. When doing graphical convolution, one function is flipped and pulled through the other, and the convolution is the multiplication of the two functions at every step in time while they're being pulled through. The following code is what I used for my convolution function.
+
+\begin{lstlisting}[language=Python]
+def my_conv(f1,f2):
+    Nf1 = len(f1)
+    Nf2 = len(f2)
+    f1Extended = np.append(f1,np.zeros((1,Nf2-1)))
+    f2Extended = np.append(f2,np.zeros((1,Nf1-1)))
+    result = np.zeros(f1Extended.shape)
+    for i in range(Nf2+Nf1-2):
+        result[i] = 0
+        for j in range(Nf1):
+            if ((i-j+1) > 0):
+                try:
+                    result[i]=result[i]+f1Extended[j]
+                    *f2Extended[i-j+1]
+                except:
+                    print(i,j)
+    return result
+\end{lstlisting}
+
+This code begins by creating new variables (Nf1, Nf2) that are the length of each of the functions being passed in, then using these to create new arrays (f1Extended, f2Extended) that are appended with zeros so that they are the length of both functions combined. This ensures that there are no length errors when adding these arrays. It then enters into nested for loops. The first for loop ensures that the final answer (result) is zeroed out before entering the second loop to begin the actual convolution. This second loop runs each instance of j (f1) through the single instance of i (f2), multiplying the two functions for each instance and adding it to what came before as it goes. In this way, f1 is being pulled through f2. It does this with the help of a try/except, which will print out any exception errors that occur. 
+
+Once achieving this defined function for convolution, I plotted the three graphs of each function convolved with the others to ensure that it worked, which it did. I then used the scipy signal.convolve to plot the convolved functions again to compare the two results. 
+ 
+ \section{Results}
+ 
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Part1_Task2.png}
+    \caption{Part 1 Task 2}
+\end{figure}
+
+The above functions are the plots for each of the three given functions that I defined in part 1. The one below is the convolution of f1 and f2, in which the convolution using my defined code is shown in red and the scipy convolution is shown in dotted black. This color pattern stands for the rest of these graphs for Part 2.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Part2_Task1.png}
+    \caption{Part 2 Task 1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Part2_Task2.png}
+    \caption{Part 2 Task 2}
+\end{figure}
+
+The graph above shows f2 convolved with f3, while the one below shows f1 convolved with f3.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Part2_Task3.png}
+    \caption{Part 2 Task 3}
+\end{figure}
+ 
+ \section{Error Analysis}
+ 
+ While trying to graph these convolutions, I ran into a few different issues. The first was that originally I defined my step and ramp functions with 
+ \begin{lstlisting}[language=Python]
+ y = np.zeros((len(t),1))
+ \end{lstlisting}
+ as the first line of the function. The 1 inside of the np.zeros() changes the array to be vertical instead of horizontal, which created issues with the arrays I defined in my convolution function. I fixed this by simply removing the 1. My second issue was with the size of t and my step. t was not defined to be long enough, so I lengthened it to cover the whole length of the new arrays defined in my\_conv, and then changed my step size to 0.01 to properly cover all of the functions. 
+ 
+ \section{Questions}
+ \subsubsection{Did you do this lab alone or with classmates? If you collaborated to get to the solution, what did that process look like?}
+ 
+ I did collaborate with classmates, mostly in the sense that we talked and bounced ideas off of each other. We did this while discussing what convolution fundamentally is, and then later when attempting to figure out what the code given to us was doing. 
+ 
+ \subsubsection{What was the most difficult part of this lab for you, and what did the process of figuring it out look like?}
+ 
+ The most difficult part of this lab was trying to figure out how to define convolution. Knowing how to use convolution mathematically and knowing how to define it with code are very different things, and very difficult to do if you don't know the programming language well, which I don't quite yet. Once we were given code for this, the second-hardest part was trying to figure out what it was doing, which involved looking up certain commands to see what they did and talking through it with others in a sort of "rubber duck" way.
+ 
+ \subsubsection{Did you approach writing the code with analytical or graphical convolution in mind? Why did you choose this approach?}
+ 
+ I definitely started with analytical in mind at first, but then realized that graphical can allow you to simplify things further. I think part of why I jumped to mathematical first is because I still didn't quite fully understand graphical at the time of the lab, but this lab has definitely helped with that understanding.
+ 
+ \subsubsection{Was any part of this lab not clearly explained?}
+ 
+ No, the lab was explained pretty well.
+ 
+ \section{Conclusion}
+ 
+ This lab was a good way to continue practicing defining functions and plotting them, but much harder because it was on convolution, which is just diffiuclt to understand in general. However, I think it was very useful because it forced us to increase our understanding of convolution to be able to figure out how to complete this lab. 
+ 
+ GitHub link: \url{https://github.com/alex9269}
+ 
+
+\end{document}
+
