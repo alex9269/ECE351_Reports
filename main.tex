@@ -1,0 +1,188 @@
+%----------------------------------------------------------------
+% Alex Morrison
+% ECE351-51
+% Lab 4
+% 10/1/19
+%----------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{multicol}
+\usepackage{hyperref}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{System Step Response Using Convolution}								
+% Title
+\author{ Alex Morrison}						
+% Author
+\date{October 1, 2019}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large ECE 351-51}\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large  Lab 4}\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Alex Morrison  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+
+    
+    
+    
+    
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+ 
+This lab continues to build upon the code that we've created in the last two labs as we use our code for step and ramp functions to define new functions, and then our code for convolution to find the step responses of these new functions. 
+\section{Equations}
+
+The functions that we defined this lab were given as:
+\begin{align*}
+    h_1(t) &= e^{2t}u(1-t) \\
+    h_2(t) &= u(t-2)-u(t-6) \\
+    h_3(t) &= cos(\omega_0t)u(t) for f_0 = 0.25Hz 
+\end{align*}
+
+ \section{Methodology}
+ 
+ I first defined these three functions in Spyder using the following code, then plotted them.
+ \begin{lstlisting}[language=Python]
+ def h1(t):
+    y = (np.exp(2*t)*step(1-t))
+    return y
+
+def h2(t):
+    y = step(t-2)-step(t-6)
+    return y
+
+f=0.25
+w=2*np.pi*f
+def h3(t):
+    y = (np.cos(w*t)*step(t))
+    return y
+\end{lstlisting}
+Satisfied with these results, I moved on to convolve each of these functions with a step function, using the code for convolution I created the week before. After plotting these convolutions, I derived the convolutions by hand (shown below) and re-plotted them to ensure that they matched. 
+\newpage
+$$ f(t) = u(t)$$
+\begin{align*}
+h_1(t)*f(t) &= \int_{-\infty}^{t} e^{2\tau} u(1-\tau)d\tau \\
+&= \int_{-\infty}^{t} e^{2\tau} u(1-\tau) d\tau + \int_{-\infty}^{t} e^{2\tau} u(\tau-1) d\tau \\
+&= \int_{-\infty}^{t} e^{2\tau} d\tau + \int_{-\infty}^{1} e^{2\tau} d\tau \\
+&= \tfrac{1}{2} e^{2\tau} \Big|_{-\infty}^{t} + \tfrac{1}{2} e^{2\tau} \Big|_{-\infty}^{1} \\
+&= \frac{1}{2} \left(e^{2t}u(1-t) + e^2u(t-1) \right) \\
+\\
+h_2(t)*f(t) &= \int_{-\infty}^{t} u(\tau-2)-u(\tau-6) d\tau \\
+&= \int_{-infty}^{t} u(\tau-2) d\tau - \int_{-\infty}^{t} u(\tau-6) d\tau \\
+&= \int_{2}^{t} d\tau - \int_{6}^{t} d\tau \\
+&= (t-2)u(t-2)-(t-6)u(t-6) \\
+&= r(t-2)-r(t-6) \\
+\\
+h_3(t)*f(t) &= \int_{0}^{t} \cos{\omega\tau} d\tau \\
+&= \frac{1}{\omega} sin(\omega\tau) \Big|_{0}^{t} \\
+&= \frac{1}{\omega}sin(\omega t)u(t)
+\end{align*}
+ 
+ \section{Results}
+ 
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{Part1_Task2.png}
+    \caption{Part 1 Task 2}
+\end{figure}
+Seen above are the plotted functions of the three given signals. 
+\newpage
+\begin{multicols}{2}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Part2_Task2.png}
+    \caption{Part 2 Task 2}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Part2_Task3.png}
+    \caption{Part 2 Task 3}
+\end{figure}
+\end{multicols}
+The plots on the left are of the computer-derived convolutions, while the hand-derived convolutions are on the right.
+ 
+ \section{Error Analysis}
+ 
+ In the previous lab I had issues with t not being long enough to properly cover the function received after convolution. To fix this, I simply doubled the length of the numbers of t. This, however, was a very short term fix. This week I solidified this fix into the following code:
+ \begin{lstlisting}[language=Python]
+ t2 = np.arange(2*t[0],2*t[len(t)-1]+steps,steps)
+ \end{lstlisting}
+ This way, I won't have to change the numbers of my t2 each time my bounds need to change.
+ 
+ \section{Questions}
+ \subsubsection{Leave any feedback on the clarity of the expectations, instructions, and deliverables here.}
+ 
+ The lab was once again explained very clearly.
+ 
+ \section{Conclusion}
+ 
+ This lab continued using the code that we've developed during the last few labs and also began introducing us to using scipy functions instead of our own. Using this created code requires a slightly different skill set as we must figure out how to properly pass values into the functions and set their parameters. 
+ 
+ 
+ GitHub link: \url{https://github.com/alex9269}
+ 
+
+\end{document}
+
