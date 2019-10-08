@@ -1,0 +1,169 @@
+%----------------------------------------------------------------
+% Alex Morrison
+% ECE351-51
+% Lab 5
+% 10/8/19
+%----------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{mathrsfs}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{Step and Impulse Response of a RLC Bandpass Filter}								
+% Title
+\author{ Alex Morrison}						
+% Author
+\date{October 8, 2019}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large ECE 351-51}\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large  Lab 5}\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Alex Morrison  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+
+    
+    
+    
+    
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+ 
+In this lab we move away from continuously defining our own code, and instead begin to use scipy functions, creating new learning curves as we adjust to new parameters that must be met. We are also moving forward in the material from class, and have jumped into using Laplace.
+
+\section{Equations}
+
+To prepare for this lab we found the transfer function of the  typical RLC circuit shown below using Laplace transforms. The variable transfer function in the s-domain can be found below along with the solved t-domain transfer function.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{prelab.PNG}
+\end{figure}
+
+$$ H(s) = \frac{s}{RCs^2 + s + \frac{R}{L}} $$
+$$ h(t) = 10356e^{-5000t}sin(18584t + 105^{\circ})$$
+
+ \section{Methodology}
+ 
+ I first plotted the t-domain transfer function that I solved for in the prelab, then I plotted the impulse reponse of this transfer function using the scipy.signal.impulse() command. This required setting up matrices that would have the correct values from the s-domain transfer function and then passing them into the sig.impulse() function. The following code demonstrates how I accomplished this. 
+ \begin{lstlisting}[language=Python]
+ num = [0,1,0]
+den = [0.0001,1,37037]
+tout, yout = sig.impulse((num,den),T=t)
+\end{lstlisting}
+
+I then plotted tout vs yout instead of t vs y. After ensuring that the two different impulse response plots looked the same, as they should, I plotted the step response using the sig.step() function, which required the same method as the sig.impulse() function. I then used the Final Value Theorem on the s-domain step response to see what value s would have as it approached zero. 
+ 
+ \section{Results}
+ 
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{impulse_response.png}
+    \caption{Part 3 Tasks 1-2}
+\end{figure}
+
+Seen above are the two graphs for the impulse response of this transfer function. Below is the step response found using sig.step().
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{step_response.png}
+    \caption{Part 4 Task 1}
+\end{figure}
+
+This is my solution for the Final Value Theorem of the s-domain step response.
+
+\begin{align*}
+    \lim_{t\to \infty} \left\{\mathcal{L}^{-1}\{H(s)u(s)\}\right\} &= 
+    \lim_{s\to 0} \left\{sH(s)u(s)\right\} \\
+    &= \lim_{s\to 0} \{H(s)\} \\
+    &= \lim_{s\to 0} \left\{\frac{s}{RCs^2 + s + \frac{R}{L}}\right\} \\
+    &= 0
+\end{align*}
+
+This solution makes sense because as seen in the plotted step response, the step response bounces back and forth across the x-axis until it eventually settles at zero, so of course the limit as s approaches 0 will be 0.
+ 
+ \section{Error Analysis}
+ 
+ There weren't really any issues with this lab. I had to ensure that my step size was small enough to allow the plots to show up correctly, and I had to fix my transfer function since I accidentally solved for the step response instead of the impulse response for the prelab, but that was about it.
+ 
+ \section{Questions}
+ \subsubsection{Explain the result of the Final Value Theorem from Part 2 Task 2 in terms of the physical circuit components.}
+ 
+ The Final Value Theorem states that as t approaches infinity, the step response approaches zero. This is because with a step function as an input, the input voltage will spike up to a value, and then stay there, essentially as DC. When this happens, the capacitor spikes up with charge, and then slowly loses it, because when the input voltage is DC, capacitors are open and inductors short out. That's why $V_{out}$ eventually reaches zero.
+ 
+ 
+ \subsubsection{Leave any feedback on the clarity of the expectations, instructions, and deliverables.}
+ 
+ This lab was a bit harder to read, maybe because in a few spots the purpose, deliverables, and actual task said almost the same thing, which was mildly confusing. 
+ 
+ \section{Conclusion}
+ 
+ This lab helped us continue to learn Python by getting used to using scipy functions instead of our own. It also allowed us to work on more material from class, as any good lab will. For this particular lab, we hadn't quite worked with RLC circuit and laplace in class yet, so this was a good push. 
+ 
+ GitHub link: \url{https://github.com/alex9269}
+ 
+
+\end{document}
+
