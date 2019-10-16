@@ -1,0 +1,167 @@
+%----------------------------------------------------------------
+% Alex Morrison
+% ECE351-51
+% Lab 6
+% 10/15/19
+%----------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{hyperref}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{Partial Fraction Expansion}								
+% Title
+\author{ Alex Morrison}						
+% Author
+\date{October 15, 2019}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large ECE 351-51}\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large  Lab 6}\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Alex Morrison  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+
+    
+    
+    
+    
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+ 
+In this lab we continued working on coding various parts of Laplace transforms by figuring out how to code for partial fraction expansion using functions defined by scipy.signal. 
+
+\section{Equations}
+
+We were given an equation for the prelab that we needed to find the transfer function of using Laplace transforms, and then use partial fraction expansion to find the step response of the function. The equation, along with its transfer function and step response, are listed below.
+
+\begin{align*}
+    y''(t) + 10y'(t) + 24y(t) &= x''(t) + 6x'(t) + 12x(t) \\
+    H(s)u(s) &= \frac{s^2 + 6s + 12}{s(s+4)(s+6)} \\
+    y(t) &= \left(\frac{1}{2} -\frac{1}{2}e^{-4t} + e^{-6t}\right)u(t)
+\end{align*}
+
+There was also a second equation used for part 2:
+$$y^{(5)} + 18y^{(4)} + 218y^{(3)} + 2036y^{(2)} + 9085y^{(1)} + 25250y(t) = 25250x(t)$$
+
+
+ \section{Methodology}
+ 
+ I first plotted the step response of the given function that I found for the prelab.I then plotted the step response again by using the transfer function I found and the sig.step() function. After confirming that these two graphs were identical, I moved on to learning the new function, sig.residue(). This function performs partical fraction expansion. It uses numerator and denominator arrays, similar to sig.step(), however, as it is a general function, I had to ensure that I was multiplying the function by $\frac{1}{s}$ in order to find the step response, meaning my denominator array was different for sig.residue() than sig.step(). I printed out the results of this command, which matched what I got by hand-calculating the step response.
+ 
+ \newpage
+ For part 2 I used sig.residue() to find the partial fraction expansion for the step response of the second given equation. With this done, I needed to find a way to combine the results to be able to use the cosine method to take the inverse laplace of the step response. I did this by creating a for loop that took the results of the sig.residue() and put them in their places via the cosine method, then added each cosine term together. The following code achieved this:
+ 
+ \begin{lstlisting}[language=Python]
+ def cos(r,p,t):
+    y1 = np.zeros((len(t)))
+    
+    for i in range(len(r)):
+        a = p[i].real
+        w = p[i].imag
+        k = abs(r[i])
+        b = np.angle(r[i])
+        y1 = (k*np.exp(a*t)*np.cos(w*t+b))*step(t) + y1
+        
+    return y1
+\end{lstlisting}
+
+I then plotted this result and the result of using sig.step() to find the step response of the given function. The graphs were identical, as they should be.
+ 
+ \section{Results}
+ 
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Task1.png}
+    \caption{Task 1}
+\end{figure}
+
+The above are my graphs for the step responses performed by hand and using sig.step() for the first function. The following are the graphs for the step responses performed using sig.residue() and the for loop performing the cosine method, and using sig.step(). Both sets of graphs are identical. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Task2.png}
+    \caption{Task 2}
+\end{figure}
+ 
+ \section{Error Analysis}
+ 
+ The hardest part of the lab was sorting out how to create the for loop that would use the cosine method to compile my step response from what the residue function gave me. Even this was not too difficult though, I just had some trouble sorting out the difference between C++ and Python syntax in my head.
+ 
+ \newpage
+ \section{Questions}
+ \subsubsection{For a non-complex pole-residue term, you can still use the cosine method, explain why this works.}
+ 
+ For pole-residue complex terms, $R=|k|\angle{k}$ in rectangular roots and $P=\alpha+j\omega$. If these terms are not complex, both j terms will be zero. The cosine method is the following: $$|k|e^{-\alpha t}cos(\omega t+\angle{k})$$
+ Therefore, when the j terms are zero, the cosine term will become 1, and we'll be left with $|k|e^{-\alpha t}$, which is exactly how we normally transform functions.
+ 
+ \section{Conclusion}
+ 
+ This lab began teaching us how to use Python functions to do necessary evils like partial fractions without having to do it by hand. Because why do anything when the machine can do it for you and save you a lot of work. 
+ 
+ GitHub link: \url{https://github.com/alex9269}
+ 
+
+\end{document}
+
