@@ -1,0 +1,212 @@
+%----------------------------------------------------------------
+% Alex Morrison
+% ECE351-51
+% Lab 7
+% 10/22/19
+%----------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{hyperref}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{Block Diagrams and System Stability}								
+% Title
+\author{ Alex Morrison}						
+% Author
+\date{October 22, 2019}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large ECE 351-51}\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large  Lab 7}\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Alex Morrison  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+
+    
+    
+    
+    
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+ 
+In this lab we continue using laplace transforms, this time to analyze the transfer functions of block diagrams. New functions such as sig.tf2zpk() will assist us for working with multiple transfer functions being multiplied together.
+
+\section{Equations}
+
+For this lab, we were given the following block diagram and its transfer functions:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{given.PNG}
+    \caption{Block Diagram for ECE 351 Lab 7}
+\end{figure}
+
+\begin{align}
+    G(s) &= \frac{s+9}{(s^2-6s-16)(s+4)} \\
+    A(s) &= \frac{s+4}{s^2+4s+3} \\
+    B(s) &= s^2+26s+168 
+\end{align}
+
+Factored forms of these equations:
+\begin{align}
+    G(s) &= \frac{s+9}{(s-8)(s+2)(s+4)} \\
+    A(s) &= \frac{s+4}{(s+3)(s+1)} \\
+    B(s) &= (s+12)(s+14)
+\end{align}
+
+Open loop transfer function:
+\begin{align}
+    H_{OL} &= \frac{s+9}{(s+3)(s+1)(s-8)(s+2)}
+\end{align}
+
+Symbolic closed loop transfer function:
+\begin{align}
+    H_{CL} &= \frac{numAnumG}{denAdenG+denAnumBnumG}
+\end{align}
+
+Closed loop transfer function from code:
+\begin{align}
+    H_{CL} &= \frac{s^2+13s+36}{2s^5+41s^4+500s^3+2995s^2+6878s+4344}
+\end{align}
+
+ \section{Methodology}
+ 
+ Our first task was to find and plot the step response of the open loop transfer function of the given block diagram. The first steps towards this were finding the poles and zeros of the factored transfer functions and verifying them using the sig.tf2zpk() python function. From my factored transfer functions seen in (4), (5), and (6) above, the poles of $G(s)$ are $s=8,-2,-4$, while its zero is $s=-9$. $A(s)$ has the poles $s=-3,-1$ and the zero $s=-4$. $B(s)$ has the zeros $s=-12,-14$. I checked this work by using the following code to implement the sig.tf2zpk() function:
+ 
+ \begin{lstlisting}[language=Python]
+numG = [1,9]
+denG = [1,-2,-40,-64]
+[ZG,PG,KG]= sig.tf2zpk(numG,denG)
+
+numA = [1,4]
+denA = [1,4,3]
+[ZA,PA,KA]= sig.tf2zpk(numA,denA)
+
+numB = [1,26,168]
+ZB = np.roots(numB)
+\end{lstlisting}
+
+I printed this result, which gave the following numbers: 
+\begin{lstlisting}[language=Python]
+ZG=[-9.]
+PG=[ 8. -4. -2.]
+KG=1.0
+
+ZA=[-4.]
+PA=[-3. -1.]
+KA=1.0
+
+ZB=[-14. -12.]
+\end{lstlisting}
+
+As these results matched the poles and zeros I calculated by hand, I moved forward with finding the open loop transfer function, as seen in equation (7) above. Since a function is unstable when it has poles that are positive, this open loop transfer function is unstable because of the pole $s=8$. The reason this causes the function to be unstable is because when transformed, it will give $e^{8t}$, which will go to infinity. 
+
+I then plotted the step response of this transfer function, using sig.convolve() to expand the denominator of poles and sig.step() to calculate the step response. This graph did match my expectations of stability for this function, as it eventually goes to infinity.
+
+For part 2 of this lab, we needed to find the step response of the closed loop transfer function. To begin, I found the transfer function in symbolic terms as seen in equation (8) above. I then used sig.convolve() and sig.tf2zpk() to find the expanded function and its new poles, then plotted its step response using sig.step().
+
+This closed loop function will be stable. After expanding the denominator and looking at its new roots, all the poles are negative complex numbers. Because all the poles are negative, it should be stable. The graph of the step response confirms this as it appears to level off around 0.008.
+ 
+ \section{Results}
+ 
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{open_loop.png}
+    \caption{Part 1 Task 5}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{closed_loop.png}
+    \caption{Part 2 Task 4}
+\end{figure}
+ 
+ \section{Error Analysis}
+ 
+ There weren't many issues with this lab, fortunately. There was some confusion as to what the symbolic representation of the closed loop transfer function should look like, but other than that it was fine.
+ 
+ \section{Questions}
+ \subsubsection{In Part 1 Task 5, why does convolving the factored terms using sig.convolve() result in the expanded form of the numerator and denominator? Would this work with your user-defined convolution function from Lab 3? Why or why not?}
+ 
+ Convolving our factored terms results in the expanded function because convolving in the s-domain is the same as multiplying in the t-domain. This would not work with our user-defined convolution functions because sig.convolve can understand that we're inputting a function with coefficients attached to lowering degrees of the variable, while our user-defined convolution would not recognize this. We input t and flip functions and then drag them through each other, it would not result in the expanded form.
+ 
+ \subsubsection{Discuss the difference between the open- and closed-loop systems from Part 1 and Part 2. How does stability differ for each case, and why?}
+ 
+ Open loops don't include any feedback, which gets rid of $B(s)$, while the closed loop system has to include this negative feedback loop. This causes the closed loop system to be stable, while the open loop system is unstable.  
+ 
+ \subsubsection{What is the difference between sig.residue() used in Lab 6 and sig.tf2zpk() used in this lab?}
+ 
+ Sig.tf2zpk() will return the zeros, poles, and gain of the function its given, while sig.residue() will return the residues (zeros), poles, and leftover coefficients of the function its given. Sig.residue() can also be given other inputs besides the numerator and denominator, such as the tolerance to set how close together different poles can be before they're considered repeated.
+ 
+ \subsubsection{Is it possible for an open-loop system to be stable? What about for a closed-loop system to be unstable? Explain how or how not for each.}
+ 
+ It is possible for open-loop systems to be stable, and for closed-loop systems to be unstable. This is because it is the poles that cause instability, and so if only negative poles are given, then the systems will be stable, while even just a few positive poles can cause the systems to be unstable, regardless of whether they're closed or open loop systems. 
+ 
+ \section{Conclusion}
+ 
+ This lab will conclude our time learning Laplace, though the skills we've gained are sure to be useful. Small nuances like having to solve the closed loop transfer function symbolically to get rid of the '1+' continue to be problems, but we're slowly learning how to avoid those. 
+ 
+ GitHub link: \url{https://github.com/alex9269}
+ 
+\end{document}
+
