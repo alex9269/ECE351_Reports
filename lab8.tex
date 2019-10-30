@@ -1,0 +1,198 @@
+%----------------------------------------------------------------
+% Alex Morrison
+% ECE351-51
+% Lab 8
+% 10/29/19
+%----------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{multicol}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{Fourier Series Approximation of a Square Wave}							
+% Title
+\author{ Alex Morrison}						
+% Author
+\date{October 29, 2019}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large ECE 351-51}\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large  Lab 8}\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Alex Morrison  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+
+    
+    
+    
+    
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+ 
+In this lab we move on to working with Fourier transforms. They are a useful way to analyze functions in the frequency domain. A common use is Fourier series, which allow us to find and work with the harmonics at different frequencies of a signal.
+
+\section{Equations}
+
+The formula for finding Fourier series is the following:
+\begin{align*}
+     x(t) &= \frac{1}{2}a_{0} + \sum_{k=1}^{\infty} a_k cos(k\omega_{0} t) + \sum_{k=1}^{\infty} b_k sin(k\omega_{0}t)
+\end{align*}
+
+With the following diagram as our given function, $a_k$, $b_k$, and $x(t)$ are the following:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{given.PNG}
+    \caption{Given Square Wave}
+\end{figure}
+\begin{align*}
+    a_k &= \frac{2}{k\pi} sin(k\pi) \\
+    &= 0 \\
+    \\
+    b_k &= -\frac{2}{k\pi} (cos(k\pi)-1) \\
+    \\
+    x(t) &= \sum_{k=1}^{\infty} -\frac{2}{k\pi} (cos(k\pi)-1)sin(k\omega_{0}t)
+\end{align*}
+
+ \section{Methodology}
+ 
+After defining my $a_k$ and $b_k$ functions in Spyder, I evaluated and printed $a_0$, $a_1$, $b_1$, $b_2$, and $b_3$. This gave the following result:
+
+\begin{lstlisting}[language=Python]
+a[0]= 0
+a[1]= 7.796343665038751e-17
+b[1]= 1.2732395447351628
+b[2]= 0.0
+b[3]= 0.4244131815783876
+\end{lstlisting}
+
+I then created nested for loops to evaluate the Fourier series at the N values $N=[1,3,15,50,150,1500]$ and plot them appropriately. These loops became the following code:
+
+\begin{lstlisting}[language=Python]
+for i in [1,2]:
+    for j in ([1+(i-1)*3,2+(i-1)*3,3+(i-1)*3]):
+        y=0
+        for m in range(1,N[j-1]+1):
+            y = bk(m)*np.sin(m*w*t) + y
+        plt.figure(i,figsize=myFigSize)
+        plt.subplot(3,1,(j-1)%3+1)
+        plt.plot(t,y)
+        plt.grid(True)
+        plt.ylabel(f"N = {N[j-1]}")
+        if j==1 or j==4:
+            plt.title('Fourier Approximations')
+        if j==3 or j==6:
+            plt.xlabel('t')
+            plt.show()
+\end{lstlisting}
+
+\newpage
+ \section{Results}
+ 
+\begin{multicols}{2}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{set_one.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{set_two.png}
+\end{figure}
+\end{multicols}
+ 
+ \newpage
+ \section{Error Analysis}
+ 
+Figuring out how to set up the for loops was tricky. The outside loop determines if we're plotting in figure 1 or 2, the second determines which subplot it is (1, 2, or 3), and the third actually runs the fourier approximation. A few tricks had to be used in the range for the second loop and in the subplot line to ensure that the correct values of N were being chosen to run the approximation in the inner loop and that the correct subplot was being used. 
+ 
+ \section{Questions}
+ \subsubsection{Is $x(t)$ an even or an odd function? Explain why.}
+ 
+$x(t)$ is an odd function because it doesn't reflect symmetrically across the y-axis.
+ 
+ \subsubsection{Based on your results from Task 1, what do you expect the values of $a_2$, $a_3$, ..., $a_n$ to be? Why}
+ 
+Based on these results, I would expect all values of $a_k$ to be zero. This makes sense because $x(t)$ is an odd function, and $a_k$ is a cosine function, which won't exist for an odd function.
+ 
+ \subsubsection{How does the approximation of the square wave change as the value of N increases? In what way does the Fourier series struggle to approximate the square wave?}
+ 
+As the value of N increases, the approximation becomes more and more square. Any function will struggle to maintain perfectly straight jumps up and down, but adding more and more frequencies layered on top of each other allows the approximation to get closer to having a perfect jump.
+ 
+ \subsubsection{What is occurring mathematically in the Fourier series summation as the value of N increases?}
+ 
+ It is adding the values of the harmonics on top of each other to better approximate the wave. As the number of harmonics approaches infinity, the jumps up and down become straighter.
+ 
+ \subsubsection{Leave any feedback on the clarity of lab tasks, expectations, and deliverable}
+ 
+It would be nice to have the the part about needing to do all the plotting within for loops in the lab handout.
+ 
+ \section{Conclusion}
+ 
+
+ 
+ GitHub link: \url{https://github.com/alex9269}
+ 
+\end{document}
+
