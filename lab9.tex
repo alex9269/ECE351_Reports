@@ -1,0 +1,178 @@
+%----------------------------------------------------------------
+% Alex Morrison
+% ECE351-51
+% Lab 9
+% 11/5/19
+%----------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{multicol}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{Fast Fourier Transform}							
+% Title
+\author{ Alex Morrison}						
+% Author
+\date{November 5, 2019}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large ECE 351-51}\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large  Lab 9}\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Alex Morrison  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+
+    
+    
+    
+    
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+
+This lab introduced us to fast fourier transforms, and we experimented with versions that "cleaned" up the resulting graphs. We made use of the for loops we worked with last week to shorten up the length of the code, as multiple large graphs were required. 
+ 
+
+\section{Equations}
+
+The given signals that we needed to plot fourier transforms of are the following:
+\begin{align}
+    cos(2\pi t) \\
+    5sin(2\pi t) \\
+    2cos((2\pi \cdot 2t)-2)+sin^2((2\pi \cdot 6t)+3)
+\end{align}
+
+ \section{Methodology}
+
+We were given code to help us figure out how to perform fast fourier transforms, but we still needed to make changes to it to ensure it worked properly. I began by using this code to define a function that would perform the fast fourier transform and then output the magnitude and angle of the given signal. I then created a for loop that would plot these graphs in the specified manner. I made an array 'x' defined as each of the three given signals, then these three repeated, and finally the output of the fourier series of the square wave given in last week's lab. My final for loop would cycle through these signals, plotting the fast fourier transform of the first three signals, then their cleaned up versions, and then the clean version of the fourier series term. 
+
+\newpage
+ \section{Results}
+ 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{signal1.png}
+    \caption{Signal 1 Fourier Transform}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{signal1_clean.png}
+    \caption{Signal 1 Clean Fourier Transform}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{signal2.png}
+    \caption{Signal 2 Fourier Transform}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{signal2_clean.png}
+    \caption{Signal 2 Clean Fourier Transform}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{signal3.png}
+    \caption{Signal 3 Fourier Transform}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{signal3_clean.png}
+    \caption{Signal 3 Clean Fourier Transform}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{fourier_clean.png}
+    \caption{Square Wave Fourier Series Clean Transform}
+\end{figure}
+
+The setup for each of these figures is as follows: the first, long plot is the initial signal vs time, the middle row is the magnitude of the signal's fourier transform vs frequency, and the bottom row is the phase shift of the signal's fourier transform. On the right side of these split columns the frequency is zoomed in to focus on the more important spikes. 
+ 
+ \section{Questions}
+ \subsubsection{What happens if $fs$ is lower? If it is higher? $fs$ in your report must span a few orders of magnitude.}
+ 
+When fs is larger, it creates a smaller step size, allowing us to find even smaller harmonics, whereas a smaller fs misses a lot of small harmonics. 
+ 
+ \subsubsection{What difference does eliminating the small phase magnitude make?}
+ 
+As suggested by the term "clean" fourier transform, it cleans up the output by allowing us to focus on the terms that are more important and getting rid of the terms that are so small that they won't really affect anything. 
+ 
+ \subsubsection{Verify your results from Tasks 1 and 2 using the Fourier transforms of cosine and sine. Explain why your results are correct. You will need the transforms in terms of Hz, not rad/s. For example, the Fourier transform of cosine (in Hz) is:
+$$\mathcal{F}\{cos(2πf_0t)\} = \frac{1}{2}[\delta (f − f_0) + \delta (f + f_0)]$$}
+ 
+
+
+ \section{Conclusion}
+ 
+This lab was interesting, and not too difficult, especially since we were given the important pieces of the code we needed, however, we haven't talked about what fast Fourier transforms are at all in class, so I don't really understand exactly what they are. Learning to graph with the subplots in this specific way was cool at least.
+ 
+ GitHub link: \url{https://github.com/alex9269}
+ 
+\end{document}
+
