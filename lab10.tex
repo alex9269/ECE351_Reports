@@ -1,0 +1,178 @@
+%----------------------------------------------------------------
+% Alex Morrison
+% ECE351-51
+% Lab 10
+% 11/12/19
+%----------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{multicol}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{Frequency Response}							
+% Title
+\author{ Alex Morrison}						
+% Author
+\date{November 12, 2019}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large ECE 351-51}\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large  Lab 10}\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Alex Morrison  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+
+    
+    
+    
+    
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+
+ This lab introduced us to creating Bode plots in Python. Bode plots are an incredibly useful way to see how a function is behaving at certain frequencies without having to see the mess it makes as it behaves against time. Plotting in decibels also allows us to see the gain of the function quite easily. We'll be learning how to use Python to plot our hand-derived equations and how to get existing Python functions to do this work for us.
+
+\section{Equations}
+
+We were given the following circuit, which had the following transfer function:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{given.PNG}
+\end{figure}
+\begin{align*}
+    H(s) &= \frac{\frac{1}{RC}s}{s^2+\frac{1}{RC}s+\frac{1}{LC}}
+\end{align*}
+
+The magnitude and phase angle of this transfer function became the following:
+\begin{align*}
+    H(j\omega) &= \frac{\frac{1}{RC}j\omega }{-\omega ^2 +\frac{1}{RC}j\omega +\frac{1}{LC}} \\
+    |H(j\omega )| &= \frac{\frac{1}{RC}\omega}{\sqrt{\left(\frac{1}{LC}-\omega^2\right)^2 +\left(\frac{1}{RC}\omega\right)^2}} \\
+    \angle H(j\omega) &= 90^{\circ}- tan^{-1}\left(\frac{\frac{1}{RC}\omega}{\frac{1}{LC}-\omega^2}\right)
+\end{align*}
+
+We were also given a signal for later use in the lab:
+\begin{align*}
+    x(t) &= cos(2\pi\cdot100t) + cos(2\pi\cdot3024t) + sin(2\pi\cdot50000t)
+\end{align*}
+
+ \section{Methodology}
+
+I began by plotting my hand-derived magnitude and phase angle of the given transfer function. They had to be plotted in degrees and decibels to be a true Bode plots, so I needed to change their units, and the phase angle also had to be shifted to show properly. The following for loop ensured that the phase angle was shifted down by pi whenever the denominator of the inverse tangent was below zero.
+\begin{lstlisting}[language=Python]
+for i in range(len(w)):
+    if (1/(L*C)-w[i]**2)<0:
+        phi_H[i] -= np.pi
+\end{lstlisting}
+
+I then used sig.bode() by inputting the numerator and denominator of the transfer function to find the same magnitude and phase angle. I then plotted these to compare my work against that of the computer. Once I was sure they agreed, I used control.Bode to find and plot the same thing, but in the frequency domain. I did this by first setting a up a system consisting of the numerator and denominator of the transfer function using con.TransferFunction(), then inputting the proper criteria for con.bode(). 
+
+For part 2, I plotted the given signal against time, then passed this signal through the RLC filter, and plotted the newly filtered signal. I did this by first giving the numerator and denominator of the transfer function to sig.bilinear(), which transformed the transfer function from the analog s-domain to the digital z-domain, then returned the new zeros and poles of the transformed function. I then gave this transformed function and my signal to sig.lfilter(), which passed the signal through the filter using a digital filter (which was why the transfer function needed to be transformed to the z-domain).
+
+ \section{Results}
+ 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{hand_derived.png}
+    \caption{Part 1 Task 1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{scipy_bode.png}
+    \caption{Part 1 Task 2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{control_bode.png}
+    \caption{Part 1 Task 3}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{filtered_signal.png}
+    \caption{Part 2 Tasks 1 & 4}
+\end{figure}
+ 
+ \section{Questions}
+ \subsubsection{Explain how the filter and filtered output in Part 2 makes sense given the Bode plots from Part 1. Discuss how the filter modifies specific frequency bands, in Hz.}
+ 
+The given signal has three frequencies that we can read on the Bode plot. At 100Hz and 50000Hz, the Bode plot indicates that the transfer function would return a small value, which would attenuate the input signal to almost zero. At 3024Hz, the Bode plot shows that the transfer function would return '1', meaning that cosine term will be left alone. Therefore, the resulting signal will only be a cosine wave with a frequency of 3024Hz. 
+ 
+ \subsubsection{Discuss the purpose and workings of scipy.signal.bilinear() and scipy.signal.lfilter().}
+ 
+sig.bilinear() takes the zeros and poles of an analog s-domain function and transforms them into the digital z-domain, and then returns the new zeros and poles. sig.lfilter() filters a signal using a digital filter in the parameters of a given function. sig.lfilter() using a digital filter is why we needed to change our transfer function to the z=domain.
+ 
+ \subsubsection{What happens if you use a different sampling frequency in scipy.signal.bilinear() than you used for the time-domain signal?}
+ 
+The frequency used for the time-domain signal is the one that evaluates what the signal is at each instance of time and creates an array to store these values. If a sampling frequency that is smaller than this is used for the sig.bilinear() function, then it will be taking steps that are too large and won't get an accurate reading on what the function should look like. On the other hand, if a sampling frequency that is bigger than this is used to sig.bilinear(), then much of the time sig.bilinear() will be attempting to evaluate the signal at frequencies that are undefined based on the original sampling frequency. This also causes issues.
+
+ \section{Conclusion}
+ 
+This lab helped wrap up the Fourier transform section of this class and lab by introducing us to Bode plots and various methods of finding and plotting them. It also helped demonstrate the usefulness of Bode plots by having us send an input signal through the transfer function, and we could then predict what the output should look like by reading the Bode plot. This is a fundamental skill for electrical engineers. 
+ 
+ GitHub link: \url{https://github.com/alex9269}
+ 
+\end{document}
+
