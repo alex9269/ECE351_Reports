@@ -1,0 +1,158 @@
+%----------------------------------------------------------------
+% Alex Morrison
+% ECE351-51
+% Lab 11
+% 11/19/19
+%----------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{multicol}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{Z-Transform Operations}							
+% Title
+\author{ Alex Morrison}						
+% Author
+\date{November 19, 2019}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large ECE 351-51}\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large  Lab 11}\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Alex Morrison  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+
+    
+    
+    
+    
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+
+ This lab introduced us to using z-transforms to analyze a transfer function. We've worked with transfer functions a lot previously while learning how to use Laplace and Fourier transforms to analyze them, but z-transforms are a new form a analysis. As we've barely been introduced to them in class, this lab was a bit preemptive, but not terrible.
+
+\section{Equations}
+
+We were given the following signal to use for this lab:
+$$ y[k] = 2x[k]-40x[k-1]+10y[k-1]-16y[k-2]$$
+
+ \section{Methodology}
+
+Assuming the given signal was initially at rest, we were to find the z-transform of the system, which is the following:
+
+\begin{align}
+    y[k] &= 2x[k]-40x[k-1]+10y[k-1]-16y[k-2] \\
+    Y(z) &= 2X(z) - 40z^{-1}X(z) +10z^{-1}Y(z) -16z^{-2}Y(z) \\
+    Y(z)(1-10z^{-1}+16z^{-2}) &= X(z)(2-40z^{-1}) \\
+    H(Z) = \frac{Y(z)}{X(z)} &= \frac{2-40z^{-2}}{1-10z^{-1}+16z^{-2}} \\
+    H(z) &= \frac{2z^2-40z}{z^2-10z+16} \\
+\end{align}
+We then needed to find h[k] using partial fraction expansion:
+\begin{align}
+    H(z) &= \frac{2z(z-20)}{(z-8)(z-2)} \\
+    \frac{H(z)}{z} &= \frac{2(z-20)}{(z-8)(z-2)} = \frac{A}{z-8}+\frac{B}{z-2}\\
+    A &= \left \frac{2(z-20)}{z-2} \right|_{z=8} = -4 \\
+    B &= \left \frac{2(z-20)}{z-8} \right|_{z=2} = 6 \\
+    H(z) &= \frac{-4z}{z-8} + \frac{6z}{z-2} \\
+    h[k] &= -4(8^k)u[k]+6(2^k)u[k]
+\end{align}
+
+With this done, I created numerator and denominator arrays containing the values of H(z) and used sig.residuez() to verify the results of the partial fraction expansion. This printed the following:
+
+\begin{lstlisting}[language=Python]
+Z =  [ 6. -4.]
+P =  [2. 8.]
+\end{lstlisting}
+
+I then used the zplane() function provided by Christopher Felton to get a zero-pole plot for H(z), and then used sig.freqz() to calculate the magnitude and phase of H(z) so I could create a Bode plot for this transfer function.
+
+ \section{Results}
+ 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{zero_pole.png}
+    \caption{Task 3: Zero-Pole Plot}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{bode.png}
+    \caption{Task 4}
+\end{figure}
+ 
+ \section{Questions}
+ \subsubsection{Looking at the plot generated in Task 4, is H(z) stable? Explain why or why not.}
+ 
+ H(z) is not stable because the poles are clearly not within the unit circle. They're positive poles that are greater than 1, which causes any exponential terms to go to infinity, making it unstable.
+
+\newpage
+ \section{Conclusion}
+ 
+This was a simple lab that allowed us to begin experimenting with z-transforms. Most of the code was given functions that we simply used to ensure that our derivations of the z-transform and assumptions of what the transfer function would look like were correct. 
+ 
+ GitHub link: \url{https://github.com/alex9269}
+ 
+\end{document}
+
