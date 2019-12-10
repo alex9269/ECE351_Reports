@@ -1,0 +1,186 @@
+%----------------------------------------------------------------
+% Alex Morrison
+% ECE351-51
+% Final Project
+% 12/10/19
+%----------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{multicol}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{Filter Design}							
+% Title
+\author{ Alex Morrison}						
+% Author
+\date{December 10, 2019}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large ECE 351-51}\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large  Final Project}\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Alex Morrison  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+
+    
+    
+    
+    
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+
+This final project pulled pieces of different analysis methods that we've learned throughout the various projects of this lab, and combined them into a realistic situation to test our skills and knowledge. The positioning system of an airplane sends a signal that needs to be read and interpreted correctly, but it picks up lots of noise from various sources. Our task was to determine what frequencies of the output signal were noise and design a filter to get rid of them, smoothing out our input signal.
+
+\section{Equations}
+
+The following equations can be used to calculate an RLC bandpass filter:
+\begin{align*}
+    H(s) &= \frac{\frac{1}{RC}s}{s^2+\frac{1}{RC}s+\frac{1}{LC}} \\
+    H(s) &= \frac{\beta s}{s^2+\beta s+{\omega_0}^2} \\
+    {\omega_0}^2 &= \frac{1}{LC} \\
+    \beta &= \frac{1}{RC} \\
+    \beta &= \omega_{C2}-\omega_{C1} \\
+    \omega_{C1} &= -\frac{1}{2}\beta +\sqrt{\left(\frac{1}{2}\beta\right)^2+{\omega_0}^2} \\
+    \omega_{C1} &= \frac{1}{2}\beta +\sqrt{\left(\frac{1}{2}\beta\right)^2+{\omega_0}^2}
+\end{align*}
+
+\newpage
+ \section{Methodology}
+
+The given signal, when graphed, was the following:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{noisy_signal.png}
+    \caption{Initial Noisy Signal}
+\end{figure}
+
+The first task was to determine which frequencies were causing the extra noise in the signal. The best tool for this was the clean fft function developed in lab 9. Running the input signal through this clean fft function, and plotting using the make\_stem function provided, allowed me to see which frequencies were problems.
+
+With this knowledge, the next task was to develop a filter that could accurately filter out these noisy frequencies. With the provided information that the desired input signal was between 1.8kHz and 2kHz, I tried to calculate the components for a RLC bandpass filter using the equations listed above. These gave me the values R$=1k\Omega$, C$=5\mu $F, and L$=55.6m$H. However, these values did not yield a Bode plot that met every requirement, so I tweaked the values until they did. These requirements were that all low noise must be attenuated by at least -30dB, all high noise must be attenuated by at least -21dB, and the desired input between 1.8kHz and 2kHz must not be attenuated more than -0.3dB. The values I ended with are R$=200\Omega$, C$=0.6\mu $F, and L$=12.5m$H. These were used in the following configuration to create a bandpass filter:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{filter.PNG}
+    \caption{RLC Bandpass Filter}
+\end{figure}
+
+After assuring that the Bode plot of this bandpass filter met all the specifications, I finally filtered the given noisy signal and then plotted its ffts again to ensure that all of the noise was indeed filtered out.
+
+ \section{Results}
+ 
+ The following graphs depict the initial fast fourier transforms of the noisy input signal. The first is the initial full overview of these fast fourier transforms, while the next three have been zoomed in to accurately show where the low noise, high noise, and desired signal occur. From these plots, we can see that the low noise occurs at 60Hz, and the high noise is from 50kHz to 500kHz.
+ 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{initial_ffts.png}
+\end{figure}
+
+The following plots show the designed transfer function's Bode plot, first as an overview of the whole plot, then zoomed in at the same three spots to ensure that the low noise, high noise, and passed values were attenuated correctly.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{transf_bode.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{zoom1.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{zoom2.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{zoom3.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{filtered_signal.png}
+\end{figure}
+
+The above graph depicts the filtered input signal, which is much cleaner and more uniform now that it has been filtered. To ensure that the correct frequencies were filtered out, more ffts are plotted below, which prove that the low and high noise is nearly nonexistent.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{filtered_ffts.png}
+\end{figure}
+
+ 
+ \section{Questions}
+ \subsubsection{Earlier this semester, you were asked what you personally wanted to get out of taking this course. Do you feel like that personal goal was met? Why or why not?}
+ 
+I can't find or remember what I said my goal was at the beginning of the semester, but I'm sure it was something along the lines of simply wanting to learn Python to be able to use it in various other classes. I think that's definitely been met. This lab reminded me how to code, as I had forgotten some of the basics of how to approach and think about writing code, so that's definitely helpful. I've already been able to use Python to help me with dynamics projects, so clearly I know enough about the program to be able to apply it to things outside of this class. I think you did a good job writing these labs and helping us progress through creating our own functions and using the given ones to have the computer do our work for us.
+
+ \section{Conclusion}
+ 
+This was a great lab to have as the final, since it required us to pull old code and analysis methods from several different labs. It also created a very realistic situation for an engineering problem we might have to solve in the field. It was nice to see a real-world application of what we've been learning in class. While it was a bit more difficult to interpret what we needed to do, that was more from a lack of understanding than anything else. Overall, it was a great lab to end on. 
+ 
+ GitHub link: \url{https://github.com/alex9269}
+ 
+\end{document}
+
